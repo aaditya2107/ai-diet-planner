@@ -3,7 +3,7 @@ import google.generativeai as genai
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-model = genai.GenerativeModel("gemini-2.5-flash")
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 st.title("🏋️ Personalized Workout & Diet Planner")
 
@@ -12,6 +12,7 @@ height = st.number_input("Height (cm)", min_value=50)
 weight = st.number_input("Weight (kg)", min_value=20)
 
 if st.button("Generate Plan"):
+
     bmi = weight / ((height/100)**2)
 
     prompt = f"""
@@ -20,10 +21,11 @@ if st.button("Generate Plan"):
     Include breakfast, lunch and dinner.
     """
 
-    response = model.generate_content(prompt)
+    try:
+        response = model.generate_content(prompt)
+        st.success(f"Your BMI: {bmi:.1f}")
+        st.write("### 🥗 AI Generated Diet Plan")
+        st.write(response.text)
 
-    st.subheader("Your BMI")
-    st.write(round(bmi,1))
-
-    st.subheader("AI Diet Plan")
-    st.write(response.text)
+    except Exception as e:
+        st.error("API Error: " + str(e))
